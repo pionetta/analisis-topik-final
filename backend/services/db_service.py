@@ -12,11 +12,11 @@ def get_db_connection():
     if turso_url and turso_token:
         try:
             import libsql_experimental as libsql
+            # Pastikan URL bersih dari query parameter
             if "?authToken=" in turso_url:
-                conn_url = turso_url
-            else:
-                conn_url = f"{turso_url}?authToken={turso_token}"
-            return libsql.connect(conn_url)
+                turso_url = turso_url.split("?authToken=")[0]
+                
+            return libsql.connect(turso_url, auth_token=turso_token)
         except ImportError:
             pass
             
