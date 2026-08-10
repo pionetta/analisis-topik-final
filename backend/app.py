@@ -37,8 +37,8 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
 def request_entity_too_large(e):
     return jsonify({"error": "Ukuran file terlalu besar. Maksimal 50 MB yang diizinkan."}), 413
 
-# Inisialisasi Database
-init_db()
+# [ARSITEKTUR] Inisialisasi Database ditiadakan saat booting agar Gunicorn tidak timeout
+# init_db()
 
 # Register Blueprints
 app.register_blueprint(upload_bp)
