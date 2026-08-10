@@ -16,7 +16,7 @@ STATIC_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist'
 app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path='/')
 
 # [KRITIKAL] CORS dibatasi hanya ke origin frontend yang dikenal (untuk mode dev & deploy)
-frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
