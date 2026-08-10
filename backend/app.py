@@ -15,18 +15,20 @@ STATIC_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist'
 
 app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path='/')
 
-# [KRITIKAL] CORS dibatasi hanya ke origin frontend yang dikenal (untuk mode dev & deploy)
-frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:7860",
-    "http://127.0.0.1:7860",
-]
-if frontend_url and frontend_url not in origins:
-    origins.append(frontend_url)
+# [KRITIKAL] CORS dibuat sangat permisif untuk mencegah error di produksi
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-CORS(app, origins=origins)
+@app.route('/health')
+def health():
+    from services.db_service import get_db_connection
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('SELECT COUNT(*) FROM movie_analysis')
+        count = c.fetchone()[0]
+        return jsonify({"status": "ok", "db_type": str(type(conn)), "row_count": count})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 # [KEAMANAN] Batasi ukuran upload maksimal 50 MB
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
