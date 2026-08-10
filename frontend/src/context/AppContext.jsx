@@ -1,4 +1,4 @@
-﻿/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
+/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 import { createContext, useState, useEffect, useCallback } from 'react';
 
 export const AppContext = createContext();
@@ -7,9 +7,13 @@ export function AppProvider({ children }) {
   // Saat production (HuggingFace), VITE_API_URL dikosongkan di .env.production
   // agar fetch menggunakan relative URL (same-origin dengan Flask).
   // Saat dev, fallback ke localhost Flask.
-  const API_BASE_URL = import.meta.env.VITE_API_URL !== undefined
+  let API_BASE_URL = import.meta.env.VITE_API_URL !== undefined
     ? import.meta.env.VITE_API_URL          // '' (production) atau 'http://...' (dev .env)
     : 'http://127.0.0.1:5000';              // fallback jika VITE_API_URL tidak di-set sama sekali
+    
+  if (API_BASE_URL.endsWith('/')) {
+    API_BASE_URL = API_BASE_URL.slice(0, -1);
+  }
 
   // ==========================================
   // STATE APLIKASI
