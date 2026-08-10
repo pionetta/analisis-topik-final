@@ -81,6 +81,36 @@ def get_saved_movies():
         return jsonify({"status": "success", "data": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@history_bp.route('/debug_history', methods=['GET'])
+def debug_history():
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('SELECT id_title, result_data FROM movie_analysis LIMIT 1')
+        row = c.fetchone()
+        conn.close()
+        
+        if not row:
+            return jsonify({"status": "empty"})
+            
+        is_empty = False
+        err = None
+        try:
+            rd = json.loads(row[1])
+        except Exception as e:
+            is_empty = True
+            err = str(e)
+            rd = None
+            
+        return jsonify({
+            "id_title": row[0],
+            "type_of_result_data": str(type(row[1])),
+            "raw_result_data_start": str(row[1])[:100],
+            "json_loads_success": not is_empty,
+            "error": err
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @history_bp.route('/saved_movies/<title>', methods=['GET'])
 def get_saved_movie_detail(title):
