@@ -6,13 +6,17 @@ DB_PATH = 'database.db'
 
 def get_db_connection():
     """Mengembalikan koneksi database menggunakan Turso atau SQLite lokal"""
-    turso_url = os.environ.get("TURSO_DATABASE_URL")
-    turso_token = os.environ.get("TURSO_AUTH_TOKEN")
+    turso_url = os.environ.get("TURSO_DATABASE_URL", "").strip().strip('"').strip("'")
+    turso_token = os.environ.get("TURSO_AUTH_TOKEN", "").strip().strip('"').strip("'")
     
     if turso_url and turso_token:
         try:
             import libsql_experimental as libsql
-            return libsql.connect(f"{turso_url}?authToken={turso_token}")
+            if "?authToken=" in turso_url:
+                conn_url = turso_url
+            else:
+                conn_url = f"{turso_url}?authToken={turso_token}"
+            return libsql.connect(conn_url)
         except ImportError:
             pass
             
